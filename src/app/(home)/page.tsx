@@ -34,7 +34,7 @@ export default function Home() {
   const handleFileUpload = async (file: File, referenceIndex: number) => {
     try {
       await uploadData({
-        path: `public/${file.name}`,
+        path: ({ identityId }) => `private/${identityId}/${file.name}`,
         data: file,
         options: {
           onProgress: ({ transferredBytes, totalBytes }) => {
