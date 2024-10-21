@@ -1,16 +1,11 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
-import { partyhoGenerateS3PreSignedUrl } from "../functions/generate-s3-pre-signed-url/resource";
 
 const schema = a.schema({
-  generateS3PreSignedUrl: a
-    .query()
-    .arguments({
-      key: a.string().required(),
-      contentType: a.string().required(),
+  Todo: a
+    .model({
+      text: a.string().required(),
     })
-    .returns(a.string().required())
-    .handler(a.handler.function(partyhoGenerateS3PreSignedUrl))
-    .authorization((allow) => allow.guest()),
+    .authorization((allow) => allow.owner()),
 });
 
 export type Schema = ClientSchema<typeof schema>;

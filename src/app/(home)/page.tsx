@@ -1,12 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { generateClient } from "aws-amplify/api";
-import axios from "axios";
 import { FileStatusCard } from "./components/FileStatusCard";
-import amplifyConfig from "@/amplify_outputs.json";
-import { Schema } from "@/amplify/data/resource";
-import { Amplify } from "aws-amplify";
+import { uploadData } from "aws-amplify/storage";
 
 interface FileProps {
   file: File;
@@ -15,10 +11,6 @@ interface FileProps {
   isUploaded?: boolean;
   path?: string;
 }
-
-Amplify.configure(amplifyConfig, { ssr: true });
-
-const client = generateClient<Schema>();
 
 export default function Home() {
   const [isUploading, setIsUploading] = useState(false);
@@ -41,22 +33,20 @@ export default function Home() {
 
   const handleFileUpload = async (file: File, referenceIndex: number) => {
     try {
-      const response = await client.queries.generateS3PreSignedUrl({
-        contentType: file.type,
-        key: `public/${file.name}`,
-      });
-      const uploadUrl = response.data as string;
-      await axios.put(uploadUrl, file, {
-        headers: {
-          "Content-Type": file.type,
+      await uploadData({
+        path: `public/${file.name}`,
+        data: file,
+        options: {
+          onProgress: ({ transferredBytes, totalBytes }) => {
+            if (totalBytes) {
+              const percentCompleted = Math.round(
+                (transferredBytes / totalBytes) * 100
+              );
+              handleUpdateFileProgress(percentCompleted, referenceIndex);
+            }
+          },
         },
-        onUploadProgress: (progressEvent) => {
-          const percentCompleted = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total!
-          );
-          handleUpdateFileProgress(percentCompleted, referenceIndex);
-        },
-      });
+      }).result;
     } catch (error) {
       console.error(error);
     }
