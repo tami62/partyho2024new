@@ -3,7 +3,7 @@ import { auth } from "./auth/resource";
 import { data } from "./data/resource";
 import { storage } from "./storage/resource";
 import { Effect, Policy, PolicyStatement } from "aws-cdk-lib/aws-iam";
-import * as s3 from "aws-cdk-lib/aws-s3";
+// import * as s3 from "aws-cdk-lib/aws-s3";
 
 /**
  * @see https://docs.amplify.aws/react/build-a-backend/ to add storage, functions, and more
@@ -14,30 +14,30 @@ const backend = defineBackend({
   storage,
 });
 
-const s3Bucket = backend.storage.resources.bucket;
+// const s3Bucket = backend.storage.resources.bucket;
 
-const cfnBucket = s3Bucket.node.defaultChild as s3.CfnBucket;
+// const cfnBucket = s3Bucket.node.defaultChild as s3.CfnBucket;
 
-cfnBucket.corsConfiguration = {
-  corsRules: [
-    {
-      allowedMethods: [
-        s3.HttpMethods.GET,
-        s3.HttpMethods.PUT,
-        s3.HttpMethods.HEAD,
-      ],
-      allowedOrigins: ["*"],
-      allowedHeaders: [
-        "Authorization",
-        "x-amz-date",
-        "x-amz-content-sha256",
-        "content-type",
-      ],
-      exposedHeaders: ["ETag", "Location"],
-      maxAge: 3000,
-    },
-  ],
-};
+// cfnBucket.corsConfiguration = {
+//   corsRules: [
+//     {
+//       allowedMethods: [
+//         s3.HttpMethods.GET,
+//         s3.HttpMethods.PUT,
+//         s3.HttpMethods.HEAD,
+//       ],
+//       allowedOrigins: ["*"],
+//       allowedHeaders: [
+//         "Authorization",
+//         "x-amz-date",
+//         "x-amz-content-sha256",
+//         "content-type",
+//       ],
+//       exposedHeaders: ["ETag", "Location"],
+//       maxAge: 3000,
+//     },
+//   ],
+// };
 
 const partyhoBedrockStack = backend.createStack("PartyhoBedrockStack");
 
