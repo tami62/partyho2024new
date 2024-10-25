@@ -116,6 +116,7 @@ export const MovieForm = () => {
       ]);
     } catch (error) {
       console.error(error);
+      displayToast("error", formatErrorMessage(error));
     } finally {
       setIsGenerating(false);
     }
