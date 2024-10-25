@@ -1,19 +1,19 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { FileStatusCard } from "./components/FileStatusCard";
-import { uploadData } from "aws-amplify/storage";
+import { FileStatusCard } from "./FileStatusCard";
+import { useFileUpload } from "@/src/shared/hooks/useFileUpload";
+import type { FileProgressHandler } from "@/src/shared/services/upload";
 
 interface FileProps {
   file: File;
   progress: number;
   error?: string;
-  isUploaded?: boolean;
   path?: string;
 }
 
-export default function Home() {
-  const [isUploading, setIsUploading] = useState(false);
+export const FilesUploader = () => {
+  const { uploadFile, isUploading, setIsUploading } = useFileUpload();
   const [previewFiles, setPreviewFiles] = useState<FileProps[]>([]);
   const [files, setFiles] = useState<File[]>([]);
 
@@ -33,20 +33,22 @@ export default function Home() {
 
   const handleFileUpload = async (file: File, referenceIndex: number) => {
     try {
-      await uploadData({
-        path: ({ identityId }) => `private/${identityId}/${file.name}`,
-        data: file,
-        options: {
-          onProgress: ({ transferredBytes, totalBytes }) => {
-            if (totalBytes) {
-              const percentCompleted = Math.round(
-                (transferredBytes / totalBytes) * 100
-              );
-              handleUpdateFileProgress(percentCompleted, referenceIndex);
-            }
-          },
-        },
-      }).result;
+      const onProgress: FileProgressHandler = ({
+        transferredBytes,
+        totalBytes,
+      }) => {
+        if (totalBytes) {
+          const percentCompleted = Math.round(
+            (transferredBytes / totalBytes) * 100
+          );
+          handleUpdateFileProgress(percentCompleted, referenceIndex);
+        }
+      };
+      await uploadFile(
+        file,
+        ({ identityId }) => `private/${identityId}/${file.name}`,
+        onProgress
+      );
     } catch (error) {
       console.error(error);
     }
@@ -72,7 +74,6 @@ export default function Home() {
       const previewFiles = files.map((file) => ({
         file,
         progress: 0,
-        isUploaded: false,
       }));
       setPreviewFiles(previewFiles);
       setFiles(files);
@@ -88,13 +89,7 @@ export default function Home() {
   };
 
   return (
-    <main className="flex flex-col max-w-4xl mx-auto p-4">
-      <h1 className="mt-14 text-3xl font-medium">Gen Roll Create</h1>
-      <p className="mt-5 text-neutral-500 font-medium">
-        Simply upload the pictures of the Guests of Honor and let Gen AI create
-        a reel for you to play at the party. For example, you can let this roll
-        play when kids are saying Are you one, Are you two synchronized -
-      </p>
+    <>
       {previewFiles.length ? (
         <div className="flex flex-col gap-4 mt-6">
           {previewFiles.map((fileEntry, index) => (
@@ -130,6 +125,6 @@ export default function Home() {
           </button>
         </div>
       </div>
-    </main>
+    </>
   );
-}
+};

@@ -14,4 +14,8 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+.form-label {
+  @apply text-lg font-medium mb-1 inline-block dark:text-white;
+}
+
 

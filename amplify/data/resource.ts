@@ -1,9 +1,11 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 
 const schema = a.schema({
-  Todo: a
+  Movie: a
     .model({
-      text: a.string().required(),
+      name: a.string().required(),
+      clues: a.string().required(),
+      images: a.string().array().required(),
     })
     .authorization((allow) => allow.owner()),
 });

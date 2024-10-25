@@ -14,5 +14,8 @@ export const storage = defineStorage({
     "private/{entity_id}/*": [
       allow.entity("identity").to(["read", "write", "delete"]),
     ],
+    "private/movie/{entity_id}/*": [
+      allow.entity("identity").to(["read", "write", "delete"]),
+    ],
   }),
 });

@@ -1,6 +1,6 @@
 import { fetchAuthSession } from "aws-amplify/auth/server";
 import { NextRequest, NextResponse } from "next/server";
-import { runWithAmplifyServerContext } from "@/src/utils/amplify-server";
+import { runWithAmplifyServerContext } from "@/src/lib/amplify-utils";
 
 const publicRoutes = ["/sign-in", "/sign-up", "/reset-password"];
 
