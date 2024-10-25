@@ -34,10 +34,13 @@ cfnBucket.corsConfiguration = {
         "x-amz-date",
         "x-amz-content-sha256",
         "content-type",
+      ],
+      exposedHeaders: [
         "x-amz-server-side-encryption",
         "x-amz-request-id",
         "x-amz-id-2",
         "ETag",
+        "Location",
       ],
       maxAge: 3000,
     },
