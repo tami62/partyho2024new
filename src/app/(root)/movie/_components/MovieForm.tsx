@@ -101,7 +101,7 @@ export const MovieForm = () => {
       setIsGenerating(true);
       const promises = values.clues.map(async (clue) => {
         const images = await GenerateImageService.generateImages(
-          `${values.name} movie with ${clue} clue`,
+          `${clue} clue`,
           1
         );
         const image = images[0];
