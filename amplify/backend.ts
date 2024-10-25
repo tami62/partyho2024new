@@ -29,12 +29,7 @@ cfnBucket.corsConfiguration = {
         s3.HttpMethods.DELETE,
       ],
       allowedOrigins: ["*"],
-      allowedHeaders: [
-        "Authorization",
-        "x-amz-date",
-        "x-amz-content-sha256",
-        "content-type",
-      ],
+      allowedHeaders: ["*"],
       exposedHeaders: [
         "x-amz-server-side-encryption",
         "x-amz-request-id",
