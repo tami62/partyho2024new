@@ -39,7 +39,6 @@ cfnBucket.corsConfiguration = {
         "x-amz-id-2",
         "ETag",
       ],
-      exposedHeaders: ["ETag", "Location"],
       maxAge: 3000,
     },
   ],
