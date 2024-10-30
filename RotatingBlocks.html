@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset='utf-8'>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <title>Page Title</title>
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+  <link rel='stylesheet' type='text/css' media='screen' href='main.css'>
+
+  <script src="pixi.js"></script>
+</head>
+
+<body>
+  <script type="module">
+
+    const app = new PIXI.Application();
+    await app.init({ background: '#2a363b', resizeTo: window });
+    document.body.appendChild(app.canvas);
+
+    const sq1 = new PIXI.Graphics();
+    const sq2 = new PIXI.Graphics();
+    const sq3 = new PIXI.Graphics();
+    const sq4 = new PIXI.Graphics();
+    const sq5 = new PIXI.Graphics();
+    const sq6 = new PIXI.Graphics();
+    const sq7 = new PIXI.Graphics();
+    const sq8 = new PIXI.Graphics();
+    const sq9 = new PIXI.Graphics();
+    // Rectangles
+  
+    //Collumn 1 
+    sq1.rect(575, 220, 100, 100).fill('#99B898');
+    sq1.x = 0;
+    sq1.y = 0;
+    sq2.rect(575, 340, 100, 100).fill('#99B898');
+    sq3.rect(575, 460, 100, 100).fill('#99B898');
+
+    //Collumn 2
+    sq4.rect(695, 220, 100, 100).fill('#99B898');
+    sq5.rect(695, 340, 100, 100).fill('#99B898');
+    sq6.rect(695, 460, 100, 100).fill('#99B898');
+
+    //Row 3
+    sq7.rect(815, 220, 100, 100).fill('#99B898');
+    sq8.rect(815, 340, 100, 100).fill('#99B898');
+    sq9.rect(815, 460, 100, 100).fill('#99B898');
+
+
+    const basicText = new PIXI.Text('' + sq1.x + " " + sq1.y + " " +sq2.x  + " " + sq2.y);
+    basicText.x = 100; // Set the X position
+    basicText.y = 200; // Set the Y position
+   
+    app.stage.addChild(sq1);
+    app.stage.addChild(sq2);
+    app.stage.addChild(sq3);
+    app.stage.addChild(sq4);
+    app.stage.addChild(sq5);
+    app.stage.addChild(sq6);
+    app.stage.addChild(sq7);
+    app.stage.addChild(sq8);
+    app.stage.addChild(sq9);
+    app.stage.addChild(basicText);
+
+    
+    //app.ticker.add(delta => clear(delta))
+      //function clear(delta) {
+    
+    //  sq1.y += 1
+     // sq2.y += 1
+     // sq3.x += 1
+     // sq4.x -= 1
+     // sq6.x += 1 
+    //  sq7.x -= 1
+     // sq8.y -= 1 
+     // sq9.y -= 1
+    //  }
+    
+        const tickerY = app.ticker.add(() => {
+        //  do {
+         //   sq1.y += 1
+         // } while (sq1.y > 120);   
+         identSquare(sq1)
+        });
+      
+      console.log(sq1.x);
+      function identSquare(square) {
+        if (square.x < 575) {
+          do {
+            square.y += 1
+          }
+          while (square.y > 120);
+        }
+      }
+        /*  else if (square.x == 575 && square.y <= 340) {
+           while (square.y <= 460) {
+             square.y += -1
+           }
+         }
+         else if (square.x >= 575 && square.y == 460) {
+           while (square.x <= 695) {
+             square.x += 1
+           }
+         }
+         else if (square.x >= 695 && square.y == 460) {
+           while (square.x <= 815) {
+             square.x += 1
+           }
+         }
+         else if (square.x == 815 && square.y == 460) {
+           while (square.y >= 340) {
+             square.y += -1
+           }
+         }
+         else if (square.x == 815 && square.y == 340) {
+           while (square.y >= 220) {
+             square.y += -1
+           }
+         }
+         else if (square.x == 815 && square.y == 220) {
+           while (square.x >= 695) {
+             square.x -= 1
+           }
+         }
+         else if (square.x == 695 && square.y == 220) {
+           while (square.x >= 575) {
+             square.x -= 1
+           }
+         } */
+
+    
+    
+    
+    //identSquare(sq1);
+
+
+      //sq1.y += 1
+      //sq2.y += 1
+      //sq3.x += 1
+      //sq4.x -= 1
+      //sq6.x += 1 
+      //sq7.x -= 1
+      //sq8.y -= 1 
+      //sq9.y -= 1
+
+    //}
+
+  </script>
+</body>
+
+</html>
