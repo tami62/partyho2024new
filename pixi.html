@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Image Slider</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel='stylesheet' type='text/css' media='screen' href='main.css'>
+    <script src="pixi.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Change the background color to wheat */
+        body {
+            background-color: #F5DEB3; /* Wheat color */
+            margin: 0; /* Remove default margin */
+            height: 100vh; /* Ensure full height */
+            display: flex; /* Use flexbox to center the content */
+            justify-content: flex-start; /* Align content to the left */
+            align-items: flex-start; /* Align items to the top */
+            overflow: hidden; /* Prevent scrolling */
+        }
+
+        /* Style for the logo */
+        #logo {
+            position: absolute;
+            top: 20px; /* Adjust this value for vertical positioning */
+            right: 20px; /* Adjust this value for horizontal positioning */
+            width: 1500px; /* Change this value for larger size */
+            height: auto; /* Maintain the aspect ratio */
+            opacity: 0.4; /* Adjust opacity to blend with background */
+            pointer-events: none; /* Ensure it doesn't interfere with button clicks */
+        }
+
+        /* Style for the controls container */
+        #controls {
+            display: flex; /* Use flexbox for alignment */
+            align-items: center; /* Center items vertically */
+            position: absolute;
+            top: 600px; /* Adjust this value to move the buttons higher */
+            left: 20px; /* Move buttons to the left side */
+            z-index: 1000;
+        }
+
+        button {
+            margin: 5px; /* Added margin for spacing */
+            padding: 8px 12px; /* Smaller padding */
+            font-size: 14px; /* Smaller font size */
+            background-color: #007BFF; /* Vibrant blue background */
+            color: white; /* White text color */
+            border: none; /* Remove default button border */
+            border-radius: 5px; /* Rounded corners */
+            cursor: pointer; /* Change cursor to pointer on hover */
+            transition: background-color 0.3s ease, transform 0.2s ease; /* Transition effects */
+        }
+
+        button:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+            transform: scale(1.05); /* Slightly scale up on hover */
+        }
+
+        .icon {
+            font-size: 20px; /* Smaller icon size */
+        }
+
+        .text-container {
+            position: absolute;
+            top: 800px; /* Adjust to position the text above the buttons */
+            left: 20px; /* Adjust to move text horizontally */
+            z-index: 1000;
+        }
+
+        /* Style for the welcome message */
+        #welcomeMessage {
+            position: absolute;
+            right: 250px; /* Position it to the right side */
+            top: 20px; /* Position it near the top */
+            font-size: 65px; /* Increase font size for prominence */
+            font-weight: bold; /* Make the text bold */
+            color: #000080; /* Use a vibrant color (e.g., Indigo) */
+            font-family: 'Righteous', cursive; /* Set a custom font family */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Add a shadow for depth */
+            z-index: 1000; /* Ensure it is above other elements */
+        }
+    </style>
+</head>
+<body>
+    <img id="logo" src="logo.jpg" alt="Logo"> <!-- Updated logo reference -->
+    <div class="text-container">
+        <span id="ageText"></span>
+    </div>
+    <div id="welcomeMessage"> 🎉Welcome to the party!🎉 </div> <!-- Added welcome message -->
+    <div id="controls">
+        <button id="backButton"><i class="fas fa-backward icon"></i></button>
+        <button id="playButton"><i class="fas fa-play icon"></i></button>
+        <button id="pauseButton" style="display: none;"><i class="fas fa-pause icon"></i></button>
+        <button id="forwardButton"><i class="fas fa-forward icon"></i></button>
+    </div>
+
+    <script type="module">
+        const app = new PIXI.Application();
+        await app.init({ background: '#F5DEB3', resizeTo: window });
+        document.body.appendChild(app.canvas);
+
+        // Generate a unique ID for the folder
+        const uniqueId = `${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+        console.log("Unique ID Folder:", uniqueId); // For debugging
+
+        // Define your S3 bucket URL and user folder
+        const bucketUrl = 'https://amplify-ddh6r4la39e6q-mai-partyhomediasbucket2ee19-iye5awbtjc7n.s3.amazonaws.com/'; // Replace with your actual bucket name
+        const userFolder = `private/${uniqueId}`; // Use the unique ID as the folder name
+
+        // Generate image URLs based on user folder and unique ID
+        const imageUrls = [];
+        const totalImages = 4; // Adjust this number to match the number of images for each user
+
+        for (let i = 0; i < totalImages; i++) {
+            imageUrls.push(`${bucketUrl}${userFolder}/image${i}.png`);
+        }
+        console.log("Image URLs:", imageUrls); // Log the generated image URLs for debugging
+
+        // Load images from S3 bucket
+        await PIXI.Assets.load(imageUrls[0]);
+        await PIXI.Assets.load(imageUrls[1]);
+        await PIXI.Assets.load(imageUrls[2]);
+        await PIXI.Assets.load(imageUrls[3]);
+
+        const graphics = new PIXI.Graphics();
+        app.stage.addChild(graphics); // Add graphics to the stage
+
+        // Set the style for the image frame
+        function drawFrame(sprite) {
+            const padding = 5; // Padding for the frame
+            graphics.clear(); // Clear previous graphics
+            graphics.lineStyle(5, 0x000000, 1); // Black border
+            graphics.drawRect(sprite.x - padding, sprite.y - padding, sprite.width + padding * 2, sprite.height + padding * 2); // Draw rectangle
+        }
+
+        const skewStyle = new PIXI.TextStyle({
+            fontFamily: 'monospace', // Change to your desired font family
+            dropShadow: {
+                alpha: 0.8,
+                angle: 1.1,
+                blur: 4,
+                color: '0x111111',
+                distance: 20,
+            },
+            fill: '#ffffff', // Font color
+            stroke: { color: '#004620', width: 12, join: 'round' },
+            fontSize: 40, // Set font size to medium (adjust as needed)
+            fontWeight: 'bold', // Set font weight
+        });
+
+        let i = 0;
+        const maxIndex = totalImages - 1; // Update this to the highest index based on your images
+
+        const playButton = document.getElementById('playButton');
+        const pauseButton = document.getElementById('pauseButton');
+        const backButton = document.getElementById('backButton');
+        const forwardButton = document.getElementById('forwardButton');
+        const ageText = document.getElementById('ageText'); // Reference to the text span
+
+        let slideInterval; // Variable to store the interval for automatic sliding
+        let currentSprite; // Variable to keep track of the current image sprite
+
+        playButton.addEventListener('click', () => {
+            // Start automatic sliding
+            if (!slideInterval) {
+                slideInterval = setInterval(() => {
+                    i = (i + 1) % (maxIndex + 1); // Increment and loop through images
+                    showAge(i);
+                }, 2000); // Change 2000 to adjust the speed (milliseconds)
+
+                // Toggle visibility of buttons
+                playButton.style.display = 'none';
+                pauseButton.style.display = 'inline';
+            }
+        });
+
+        pauseButton.addEventListener('click', () => {
+            clearInterval(slideInterval); // Stop the automatic sliding
+            slideInterval = null; // Reset interval
+
+            // Toggle visibility of buttons
+            playButton.style.display = 'inline';
+            pauseButton.style.display = 'none';
+        });
+
+        backButton.addEventListener('click', () => {
+            i = (i - 1 + maxIndex + 1) % (maxIndex + 1); // Loop back to last image
+            showAge(i); // Update display immediately
+        });
+
+        forwardButton.addEventListener('click', () => {
+            i = (i + 1) % (maxIndex + 1); // Loop to first image
+            showAge(i); // Update display immediately
+        });
+
+        function showAge(index) {
+            if (currentSprite) {
+                app.stage.removeChild(currentSprite); // Remove the previous sprite if it exists
+            }
+
+            currentSprite = new PIXI.Sprite.from(imageUrls[index]); // Create a new sprite for the current image
+            currentSprite.anchor.set(0.5); // Set anchor point to center
+            currentSprite.x = app.screen.width / 2; // Center horizontally
+            currentSprite.y = app.screen.height / 2; // Center vertically
+            app.stage.addChild(currentSprite); // Add the sprite to the stage
+            drawFrame(currentSprite); // Draw the frame around the image
+
+            // Set the age text based on the current index
+            ageText.text = `Image ${index + 1}`; // Change this based on your requirement
+        }
+
+        // Start the slider by showing the first image
+        showAge(0);
+    </script>
+</body>
+</html>
