@@ -71,13 +71,13 @@ export const FilesUploader = () => {
   const handleRemoveFile = (referenceIndex: number) => () => {
     setPreviewFiles((prev) => {
       const updatedFiles = [...prev];
-      updatedFiles.splice(referenceIndex, 1);
+      updatedFiles.splice(referenceIndex, 1);        
       return updatedFiles;
     });
   };
 
   const navigateToPixiPage = () => {
-    router.push("/pixipage.html"); // Replace "/pixi-page" with the actual path of your Pixi page
+    router.push("../../../../pixipage.html"); // Replace "/pixi-page" with the actual path of your Pixi page
   };
 
   return (
