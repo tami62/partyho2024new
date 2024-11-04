@@ -77,7 +77,7 @@ export const FilesUploader = () => {
   };
 
   const navigateToPixiPage = () => {
-    router.push("./pixipage.html"); // Replace "/pixi-page" with the actual path of your Pixi page
+    router.push("/pixipage.html"); // Replace "/pixi-page" with the actual path of your Pixi page
   };
 
   return (
