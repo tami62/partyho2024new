@@ -1,4 +1,7 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import { FileStatusCard } from "./FileStatusCard";
 import { useFileUpload } from "@/src/shared/hooks/useFileUpload";
 import type { FileProgressHandler } from "@/src/shared/services/upload";
@@ -11,10 +14,11 @@ interface FileProps {
 }
 
 export const FilesUploader = () => {
-  const { uploadFile, isUploading, setIsUploading, listFiles, getIdentityId } = useFileUpload();
+  const { uploadFile, isUploading, setIsUploading } = useFileUpload();
   const [previewFiles, setPreviewFiles] = useState<FileProps[]>([]);
   const [files, setFiles] = useState<File[]>([]);
-  const [uploadedImageUrls, setUploadedImageUrls] = useState<string[]>([]);
+  const [uploadedFileURLs, setUploadedFileURLs] = useState<string[]>([]);
+  const router = useRouter();
 
   const handleUpdateFileProgress = (
     progress: number,
@@ -43,11 +47,14 @@ export const FilesUploader = () => {
           handleUpdateFileProgress(percentCompleted, referenceIndex);
         }
       };
-
-      // Get the identity ID dynamically for folder path
-      const identityId = await getIdentityId();
-      const folderPath = `private/${identityId}/${file.name}`;
-      await uploadFile(file, () => folderPath, onProgress);
+      const result = await uploadFile(
+        file,
+        ({ identityId }) => `private/${identityId}/${file.name}`,
+        onProgress
+      );
+      if (result?.url) {
+        setUploadedFileURLs((prev) => [...prev, result.url]); // Save the URL
+      }
     } catch (error) {
       console.error(error);
     }
@@ -87,15 +94,11 @@ export const FilesUploader = () => {
     });
   };
 
-  const handleGenerateRoll = async () => {
-    try {
-      const identityId = await getIdentityId();
-      const folderPath = `private/${identityId}/`;
-      const files = await listFiles(folderPath);
-      setUploadedImageUrls(files);
-    } catch (error) {
-      console.error("Failed to retrieve images:", error);
-    }
+  const handleGenerateRoll = () => {
+    router.push({
+      pathname: "/roll-display",
+      query: { urls: JSON.stringify(uploadedFileURLs) },
+    });
   };
 
   return (
@@ -133,18 +136,12 @@ export const FilesUploader = () => {
           <button
             onClick={handleGenerateRoll}
             className="bg-orange-400 text-black p-2 w-full"
+            disabled={uploadedFileURLs.length === 0} // Disable if no files are uploaded
           >
             Generate Roll
           </button>
         </div>
       </div>
-      {uploadedImageUrls.length > 0 && (
-        <div className="mt-8 grid grid-cols-3 gap-4">
-          {uploadedImageUrls.map((url, index) => (
-            <img key={index} src={url} alt={`Uploaded image ${index + 1}`} />
-          ))}
-        </div>
-      )}
     </>
   );
 };
