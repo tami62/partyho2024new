@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { FileStatusCard } from "./FileStatusCard";
 import { useFileUpload } from "@/src/shared/hooks/useFileUpload";
 import type { FileProgressHandler } from "@/src/shared/services/upload";
@@ -14,12 +13,14 @@ interface FileProps {
 }
 
 export const FilesUploader = () => {
-  const router = useRouter();
   const { uploadFile, isUploading, setIsUploading } = useFileUpload();
   const [previewFiles, setPreviewFiles] = useState<FileProps[]>([]);
   const [files, setFiles] = useState<File[]>([]);
 
-  const handleUpdateFileProgress = (progress: number, referenceIndex: number) => {
+  const handleUpdateFileProgress = (
+    progress: number,
+    referenceIndex: number
+  ) => {
     setPreviewFiles((prev) => {
       const updatedFiles = [...prev];
       updatedFiles[referenceIndex] = {
@@ -32,13 +33,22 @@ export const FilesUploader = () => {
 
   const handleFileUpload = async (file: File, referenceIndex: number) => {
     try {
-      const onProgress: FileProgressHandler = ({ transferredBytes, totalBytes }) => {
+      const onProgress: FileProgressHandler = ({
+        transferredBytes,
+        totalBytes,
+      }) => {
         if (totalBytes) {
-          const percentCompleted = Math.round((transferredBytes / totalBytes) * 100);
+          const percentCompleted = Math.round(
+            (transferredBytes / totalBytes) * 100
+          );
           handleUpdateFileProgress(percentCompleted, referenceIndex);
         }
       };
-      await uploadFile(file, ({ identityId }) => `private/${identityId}/${file.name}`, onProgress);
+      await uploadFile(
+        file,
+        ({ identityId }) => `private/${identityId}/${file.name}`,
+        onProgress
+      );
     } catch (error) {
       console.error(error);
     }
@@ -47,7 +57,9 @@ export const FilesUploader = () => {
   useEffect(() => {
     if (files.length) {
       setIsUploading(true);
-      Promise.allSettled(files.map((file, index) => handleFileUpload(file, index))).finally(() => {
+      Promise.allSettled(
+        files.map((file, index) => handleFileUpload(file, index))
+      ).finally(() => {
         setIsUploading(false);
       });
     }
@@ -71,13 +83,9 @@ export const FilesUploader = () => {
   const handleRemoveFile = (referenceIndex: number) => () => {
     setPreviewFiles((prev) => {
       const updatedFiles = [...prev];
-      updatedFiles.splice(referenceIndex, 1);        
+      updatedFiles.splice(referenceIndex, 1);
       return updatedFiles;
     });
-  };
-
-  const navigateToPixiPage = () => {
-    router.push("/pixipage.html"); // Replace "/pixi-page" with the actual path of your Pixi page
   };
 
   return (
@@ -112,7 +120,7 @@ export const FilesUploader = () => {
               hidden
             />
           </button>
-          <button className="bg-orange-400 text-black p-2 w-full" onClick={navigateToPixiPage}>
+          <button className="bg-orange-400 text-black p-2 w-full">
             Generate Roll
           </button>
         </div>
