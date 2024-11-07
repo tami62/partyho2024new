@@ -158,8 +158,8 @@ export const FilesUploader = () => {
                 <img
                   src={fileEntry.path}
                   alt={fileEntry.file.name}
-                  width={100}
-                  height={100}
+                  width={2000}
+                  height={2000}
                   style={{ objectFit: 'cover' }}
                 />
                 <p>{fileEntry.file.name}</p>
