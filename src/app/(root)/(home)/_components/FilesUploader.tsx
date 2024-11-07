@@ -151,16 +151,16 @@ export const FilesUploader = () => {
       {showImages && uploadedFiles.length > 0 && (
         <div className="mt-8">
           <h3 className="text-xl">Uploaded Files:</h3>
-          <ul>
+          <ul className="grid grid-cols-2 gap-4">
             {uploadedFiles.map((fileEntry, index) => (
-              <li key={index}>
+              <li key={index} className="flex flex-col items-center">
                 {/* Display the image from the URL */}
                 <img
                   src={fileEntry.path}
                   alt={fileEntry.file.name}
-                  width={2000}
-                  height={2000}
-                  style={{ objectFit: 'cover' }}
+                  width={100}
+                  height={100}
+                  style={{ objectFit: "cover" }}
                 />
                 <p>{fileEntry.file.name}</p>
               </li>
