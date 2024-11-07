@@ -16,7 +16,7 @@ export const FilesUploader = () => {
   const { uploadFile, isUploading, setIsUploading } = useFileUpload();
   const [previewFiles, setPreviewFiles] = useState<FileProps[]>([]);
   const [files, setFiles] = useState<File[]>([]);
-  const [uploadedFiles, setUploadedFiles] = useState<FileProps[]>([]); // Store file info including path
+  const [uploadedFiles, setUploadedFiles] = useState<FileProps[]>([]);
 
   const handleUpdateFileProgress = (
     progress: number,
@@ -45,16 +45,20 @@ export const FilesUploader = () => {
           handleUpdateFileProgress(percentCompleted, referenceIndex);
         }
       };
+      // Upload the file to S3 or your chosen storage
       await uploadFile(
         file,
         ({ identityId }) => `private/${identityId}/${file.name}`,
         onProgress
       );
 
-      // After successful upload, store the file path and progress information
+      // After successful upload, create the public URL for the uploaded file
+      const fileUrl = `https://<your-bucket-name>.s3.<region>.amazonaws.com/private/${file.name}`;
+      
+      // Update the uploadedFiles state with the file URL
       setUploadedFiles((prev) => [
         ...prev,
-        { file, progress: 100, path: `private/${file.name}` }, // Set the path once uploaded
+        { file, progress: 100, path: fileUrl },
       ]);
     } catch (error) {
       console.error(error);
@@ -148,7 +152,14 @@ export const FilesUploader = () => {
           <ul>
             {uploadedFiles.map((fileEntry, index) => (
               <li key={index}>
-                <img src={fileEntry.path} alt={fileEntry.file.name} width={100} />
+                {/* Display the image from the URL */}
+                <img
+                  src={fileEntry.path}
+                  alt={fileEntry.file.name}
+                  width={100}
+                  height={100}
+                  style={{ objectFit: 'cover' }}
+                />
                 <p>{fileEntry.file.name}</p>
               </li>
             ))}
