@@ -15,9 +15,8 @@ interface FileProps {
 export const FilesUploader = () => {
   const { uploadFile, isUploading, setIsUploading } = useFileUpload();
   const [previewFiles, setPreviewFiles] = useState<FileProps[]>([]);
-  const [files, setFiles] = useState<File[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<FileProps[]>([]);
-  const [showImages, setShowImages] = useState(false); // To control when images are shown
+  const [showImages, setShowImages] = useState(false);
 
   const handleUpdateFileProgress = (
     progress: number,
@@ -35,79 +34,49 @@ export const FilesUploader = () => {
 
   const handleFileUpload = async (file: File, referenceIndex: number) => {
     try {
-      const onProgress: FileProgressHandler = ({
-        transferredBytes,
-        totalBytes,
-      }) => {
+      const onProgress: FileProgressHandler = ({ transferredBytes, totalBytes }) => {
         if (totalBytes) {
-          const percentCompleted = Math.round(
-            (transferredBytes / totalBytes) * 100
-          );
+          const percentCompleted = Math.round((transferredBytes / totalBytes) * 100);
           handleUpdateFileProgress(percentCompleted, referenceIndex);
         }
       };
-      // Upload the file to S3 or your chosen storage
-      await uploadFile(
+
+      // Upload the file
+      const { path } = await uploadFile(
         file,
         ({ identityId }) => `private/${identityId}/${file.name}`,
         onProgress
       );
 
-      // After successful upload, create the public URL for the uploaded file
-      const fileUrl = `https://<your-bucket-name>.s3.<region>.amazonaws.com/private/${file.name}`;
-      
-      // Update the uploadedFiles state with the file URL
-      setUploadedFiles((prev) => [
-        ...prev,
-        { file, progress: 100, path: fileUrl },
-      ]);
+      // Add the uploaded file info to the state
+      setUploadedFiles((prev) => [...prev, { file, progress: 100, path }]);
     } catch (error) {
       console.error(error);
+      handleUpdateFileProgress(-1, referenceIndex);  // Mark error in progress
     }
   };
 
-  useEffect(() => {
-    if (files.length) {
-      setIsUploading(true);
-      Promise.allSettled(
-        files.map((file, index) => handleFileUpload(file, index))
-      ).finally(() => {
-        setIsUploading(false);
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [files]);
+  const handleFilesUpload = () => {
+    setIsUploading(true);
+    Promise.all(previewFiles.map((file, index) => handleFileUpload(file.file, index)))
+      .finally(() => setIsUploading(false));
+  };
 
   const handleOnSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFiles([]);
-    const newFiles = event.target.files;
-    if (newFiles) {
-      const files = Array.from(newFiles);
-      const previewFiles = files.map((file) => ({
-        file,
-        progress: 0,
-      }));
-      setPreviewFiles(previewFiles);
-      setFiles(files);
-    }
+    const newFiles = Array.from(event.target.files || []);
+    const previewFiles = newFiles.map((file) => ({ file, progress: 0 }));
+    setPreviewFiles(previewFiles);
   };
 
   const handleRemoveFile = (referenceIndex: number) => () => {
-    setPreviewFiles((prev) => {
-      const updatedFiles = [...prev];
-      updatedFiles.splice(referenceIndex, 1);
-      return updatedFiles;
-    });
+    setPreviewFiles((prev) => prev.filter((_, idx) => idx !== referenceIndex));
   };
 
-  const handleGenerateRoll = () => {
-    // Show the images when the roll is generated
-    setShowImages(true);
-  };
+  const handleGenerateRoll = () => setShowImages(true);
 
   return (
     <>
-      {previewFiles.length ? (
+      {previewFiles.length > 0 && (
         <div className="flex flex-col gap-4 mt-6">
           {previewFiles.map((fileEntry, index) => (
             <FileStatusCard
@@ -118,7 +87,7 @@ export const FilesUploader = () => {
             />
           ))}
         </div>
-      ) : null}
+      )}
 
       <div className="mt-8 flex flex-col items-end gap-4">
         <div className="flex flex-col items-end gap-4 w-52">
@@ -147,20 +116,18 @@ export const FilesUploader = () => {
         </div>
       </div>
 
-      {/* Display the uploaded images only after "Generate Roll" is clicked */}
       {showImages && uploadedFiles.length > 0 && (
         <div className="mt-8">
           <h3 className="text-xl">Uploaded Files:</h3>
-          <ul>
+          <ul className="grid grid-cols-3 gap-4">
             {uploadedFiles.map((fileEntry, index) => (
               <li key={index}>
-                {/* Display the image from the URL */}
                 <img
                   src={fileEntry.path}
                   alt={fileEntry.file.name}
                   width={100}
                   height={100}
-                  style={{ objectFit: 'cover' }}
+                  style={{ objectFit: "cover" }}
                 />
                 <p>{fileEntry.file.name}</p>
               </li>
