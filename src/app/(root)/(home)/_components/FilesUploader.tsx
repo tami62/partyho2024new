@@ -16,7 +16,7 @@ export const FilesUploader = () => {
   const { uploadFile, isUploading, setIsUploading } = useFileUpload();
   const [previewFiles, setPreviewFiles] = useState<FileProps[]>([]);
   const [files, setFiles] = useState<File[]>([]);
-  const [uploadedFiles, setUploadedFiles] = useState<string[]>([]); // Store uploaded file paths
+  const [uploadedFiles, setUploadedFiles] = useState<FileProps[]>([]); // Store file info including path
 
   const handleUpdateFileProgress = (
     progress: number,
@@ -50,8 +50,12 @@ export const FilesUploader = () => {
         ({ identityId }) => `private/${identityId}/${file.name}`,
         onProgress
       );
-      // After the file is uploaded successfully, add it to the uploadedFiles array
-      setUploadedFiles((prev) => [...prev, `private/${file.name}`]);
+
+      // After successful upload, store the file path and progress information
+      setUploadedFiles((prev) => [
+        ...prev,
+        { file, progress: 100, path: `private/${file.name}` }, // Set the path once uploaded
+      ]);
     } catch (error) {
       console.error(error);
     }
@@ -110,6 +114,7 @@ export const FilesUploader = () => {
           ))}
         </div>
       ) : null}
+
       <div className="mt-8 flex flex-col items-end gap-4">
         <div className="flex flex-col items-end gap-4 w-52">
           <button
@@ -136,12 +141,16 @@ export const FilesUploader = () => {
           </button>
         </div>
       </div>
+
       {uploadedFiles.length > 0 && (
         <div className="mt-8">
           <h3 className="text-xl">Uploaded Files:</h3>
           <ul>
-            {uploadedFiles.map((filePath, index) => (
-              <li key={index}>{filePath}</li>
+            {uploadedFiles.map((fileEntry, index) => (
+              <li key={index}>
+                <img src={fileEntry.path} alt={fileEntry.file.name} width={100} />
+                <p>{fileEntry.file.name}</p>
+              </li>
             ))}
           </ul>
         </div>
