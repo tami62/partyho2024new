@@ -16,7 +16,7 @@ export const FilesUploader = () => {
   const { uploadFile, isUploading, setIsUploading } = useFileUpload();
   const [previewFiles, setPreviewFiles] = useState<FileProps[]>([]);
   const [files, setFiles] = useState<File[]>([]);
-  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [uploadedFiles, setUploadedFiles] = useState<string[]>([]); // Store uploaded file paths
 
   const handleUpdateFileProgress = (
     progress: number,
@@ -45,24 +45,16 @@ export const FilesUploader = () => {
           handleUpdateFileProgress(percentCompleted, referenceIndex);
         }
       };
-      const response = await uploadFile(
+      await uploadFile(
         file,
         ({ identityId }) => `private/${identityId}/${file.name}`,
         onProgress
       );
-      if (response?.Location) {
-        setUploadedImages((prev) => [...prev, response.Location]);
-      }
+      // After the file is uploaded successfully, add it to the uploadedFiles array
+      setUploadedFiles((prev) => [...prev, `private/${file.name}`]);
     } catch (error) {
       console.error(error);
     }
-  };
-
-  const handleGenerateRoll = async () => {
-    // Here we simulate generating a roll and fetching the uploaded images
-    console.log("Generating roll...");
-    // You might call a backend API to perform additional processing if needed
-    // After processing, we update the `uploadedImages` state to display them
   };
 
   useEffect(() => {
@@ -97,7 +89,11 @@ export const FilesUploader = () => {
       updatedFiles.splice(referenceIndex, 1);
       return updatedFiles;
     });
-    setUploadedImages((prev) => prev.filter((_, i) => i !== referenceIndex));
+  };
+
+  const handleGenerateRoll = () => {
+    // Display the list of uploaded files after generating the roll
+    console.log("Generated Roll:", uploadedFiles);
   };
 
   return (
@@ -140,18 +136,16 @@ export const FilesUploader = () => {
           </button>
         </div>
       </div>
-      {uploadedImages.length ? (
-        <div className="mt-6 grid grid-cols-2 gap-4">
-          {uploadedImages.map((image, index) => (
-            <img
-              key={index}
-              src={image}
-              alt={`Uploaded file ${index + 1}`}
-              className="w-full h-auto object-cover rounded-lg shadow"
-            />
-          ))}
+      {uploadedFiles.length > 0 && (
+        <div className="mt-8">
+          <h3 className="text-xl">Uploaded Files:</h3>
+          <ul>
+            {uploadedFiles.map((filePath, index) => (
+              <li key={index}>{filePath}</li>
+            ))}
+          </ul>
         </div>
-      ) : null}
+      )}
     </>
   );
 };
