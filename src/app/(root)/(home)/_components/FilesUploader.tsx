@@ -17,6 +17,7 @@ export const FilesUploader = () => {
   const [previewFiles, setPreviewFiles] = useState<FileProps[]>([]);
   const [files, setFiles] = useState<File[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<FileProps[]>([]);
+  const [showImages, setShowImages] = useState(false); // To control when images are shown
 
   const handleUpdateFileProgress = (
     progress: number,
@@ -100,8 +101,8 @@ export const FilesUploader = () => {
   };
 
   const handleGenerateRoll = () => {
-    // Display the list of uploaded files after generating the roll
-    console.log("Generated Roll:", uploadedFiles);
+    // Show the images when the roll is generated
+    setShowImages(true);
   };
 
   return (
@@ -146,7 +147,8 @@ export const FilesUploader = () => {
         </div>
       </div>
 
-      {uploadedFiles.length > 0 && (
+      {/* Display the uploaded images only after "Generate Roll" is clicked */}
+      {showImages && uploadedFiles.length > 0 && (
         <div className="mt-8">
           <h3 className="text-xl">Uploaded Files:</h3>
           <ul>
